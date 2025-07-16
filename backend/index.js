@@ -1,13 +1,18 @@
-const mongoose = require('mongoose');
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const productRoutes = require('./routes/productRoutes'); 
+const demarrageDataBase = require('./dataBase');
 
-app.use(cors()); //active CORS pour toutes les requetes
+app.use(express.json());
 
+//active CORS pour toutes les requetes
+app.use(cors()); 
 
-mongoose.connect('mongodb+srv://kilian:<db_password>@cluster0.kkk12ln.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
-  { useNewUrlParser: true,
-    useUnifiedTopology: true })
-  .then(() => console.log('Connexion à MongoDB réussie !'))
-  .catch(() => console.log('Connexion à MongoDB échouée !'));
+//lancement DB
+demarrageDataBase().then(() => {
+  app.listen(3000, () => console.log('Serveur lancé'));
+});
+
+//ajoute les routes sous le chemin /api/
+app.use('/api', productRoutes);
