@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const productRoutes = require('./routes/productRoutes'); 
+const menuRoutes = require('./routes/menuRoutes');
 const demarrageDataBase = require('./dataBase');
 
 app.use(express.json());
@@ -16,3 +17,4 @@ demarrageDataBase().then(() => {
 
 //ajoute les routes sous le chemin /api/
 app.use('/api', productRoutes);
+app.use('/api', menuRoutes);
