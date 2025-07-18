@@ -6,8 +6,6 @@ const menuRoutes = require('./routes/menuRoutes');
 const demarrageDataBase = require('./dataBase');
 
 app.use(express.json());
-
-//active CORS pour toutes les requetes
 app.use(cors()); 
 
 //lancement DB
