@@ -6,17 +6,10 @@ const MenusSchema = new mongoose.Schema({
      description: {type: String, required: true},
      prix: {type: Number, required: true},
      image: {type: String, required:true},
-     products: [ // liste des produits à inclure dans le menu
+     composition: [
     {
-      
-      quantity: Number,
-      required: Boolean, //Indique si ce produit est obligatoire dans le menu
-      options: [         // Si supplement
-        {
-          name: String, 
-          values: [String] 
-        }
-      ]
+      nom: { type: String, required: true },     
+      quantite: { type: Number, required: true}
     }
   ],
 });
