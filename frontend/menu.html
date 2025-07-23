@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gestion des Menus</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    button {
+      padding: 8px 15px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    input, select {
+      display: block;
+      margin-bottom: 10px;
+      padding: 5px;
+      width: 300px;
+    }
+    .menu {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .composition-item {
+      margin-left: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <button onclick="window.location.href='index.html'">← Retour à l'accueil</button>
+
+  <h1>Gestion des Menus</h1>
+
+  <form id="menuForm">
+    <input type="text" id="nom" placeholder="Nom du menu" required />
+    <input type="text" id="description" placeholder="Description du menu" required />
+    <input type="number" id="prix" placeholder="Prix (€)" step="0.01" required />
+    <input type="text" id="image" placeholder="Nom de l'image (ex: menu.jpg)" required />
+
+    <h3>Composition</h3>
+    <div id="compositionList"></div>
+    <input type="text" id="compNom" placeholder="Nom de l'ingrédient" />
+    <input type="number" id="compQuantite" placeholder="Quantité" />
+    <button type="button" onclick="addComposition()">Ajouter un ingrédient</button>
+
+    <button type="submit" style="margin-top:15px;">Créer / Modifier</button>
+  </form>
+
+  <hr />
+
+  <button onclick="getMenus()">Voir les menus</button>
+
+  <div id="menusList"></div>
+
+<script>
+  const apiUrl = 'http://localhost:3000/api/menus';
+  let composition = [];
+
+  // Ajouter un ingrédient à la composition
+  function addComposition() {
+    const nom = document.getElementById('compNom').value.trim();
+    const quantite = parseInt(document.getElementById('compQuantite').value);
+    if (!nom || isNaN(quantite) || quantite <= 0) {
+      alert('Veuillez entrer un nom valide et une quantité positive.');
+      return;
+    }
+    composition.push({ nom, quantite });
+    renderComposition();
+    document.getElementById('compNom').value = '';
+    document.getElementById('compQuantite').value = '';
+  }
+
+  // Afficher la liste des ingrédients dans la composition
+  function renderComposition() {
+    const list = document.getElementById('compositionList');
+    list.innerHTML = '';
+    composition.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.className = 'composition-item';
+      div.textContent = `${item.nom} — Quantité : ${item.quantite} `;
+      const btnSuppr = document.createElement('button');
+      btnSuppr.textContent = 'Supprimer';
+      btnSuppr.style.marginLeft = '10px';
+      btnSuppr.onclick = () => {
+        composition.splice(index, 1);
+        renderComposition();
+      };
+      div.appendChild(btnSuppr);
+      list.appendChild(div);
+    });
+  }
+
+  // Créer ou modifier un menu
+  document.getElementById('menuForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const data = {
+      nom: document.getElementById('nom').value,
+      description: document.getElementById('description').value,
+      prix: parseFloat(document.getElementById('prix').value),
+      image: document.getElementById('image').value,
+      composition
+    };
+
+    try {
+      const res = await fetch(apiUrl, {
+        method: 'POST',  // à adapter si tu veux gérer aussi la modification (PUT)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      alert(result.message || 'Menu enregistré !');
+      composition = [];
+      renderComposition();
+      document.getElementById('menuForm').reset();
+      getMenus();
+    } catch (err) {
+      alert('Erreur lors de l\'enregistrement du menu');
+      console.error(err);
+    }
+  });
+
+  // Afficher tous les menus
+  async function getMenus() {
+    try {
+      const res = await fetch(apiUrl);
+      const menus = await res.json();
+
+      const container = document.getElementById('menusList');
+      container.innerHTML = '<h3>Menus :</h3>';
+
+      menus.forEach(menu => {
+        const div = document.createElement('div');
+        div.className = 'menu';
+        div.innerHTML = `
+          <strong>${menu.nom}</strong> - ${menu.prix} €<br>
+          <em>${menu.description}</em><br>
+          <img src="${menu.image || 'placeholder.jpg'}" alt="${menu.nom}" style="max-width:100px;"><br>
+          Composition:<br>
+          <ul>
+            ${menu.composition.map(c => `<li>${c.nom} - Quantité: ${c.quantite}</li>`).join('')}
+          </ul>
+          <button onclick="deleteMenu('${menu._id}')">Supprimer</button>
+          <button onclick="editMenu('${menu._id}')">Modifier</button>
+        `;
+        container.appendChild(div);
+      });
+    } catch (err) {
+      alert('Erreur lors de la récupération des menus');
+      console.error(err);
+    }
+  }
+
+  // Supprimer un menu
+  async function deleteMenu(id) {
+    if (!confirm('Voulez-vous vraiment supprimer ce menu ?')) return;
+    try {
+      await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
+      alert('Menu supprimé !');
+      getMenus();
+    } catch (err) {
+      alert('Erreur lors de la suppression');
+      console.error(err);
+    }
+  }
+
+  // Modifier un menu (charge les données dans le formulaire)
+  async function editMenu(id) {
+    try {
+      const res = await fetch(`${apiUrl}/${id}`);
+      const menu = await res.json();
+
+      document.getElementById('nom').value = menu.nom;
+      document.getElementById('description').value = menu.description;
+      document.getElementById('prix').value = menu.prix;
+      document.getElementById('image').value = menu.image;
+      composition = menu.composition || [];
+      renderComposition();
+
+      // Change le submit pour faire un PUT au lieu de POST
+      document.getElementById('menuForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const data = {
+          nom: document.getElementById('nom').value,
+          description: document.getElementById('description').value,
+          prix: parseFloat(document.getElementById('prix').value),
+          image: document.getElementById('image').value,
+          composition
+        };
+        try {
+          const res = await fetch(`${apiUrl}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          const result = await res.json();
+          alert(result.message || 'Menu modifié !');
+          composition = [];
+          renderComposition();
+          document.getElementById('menuForm').reset();
+          // Restaure le comportement du formulaire pour création
+          document.getElementById('menuForm').onsubmit = defaultFormSubmit;
+          getMenus();
+        } catch (err) {
+          alert('Erreur lors de la modification');
+          console.error(err);
+        }
+      };
+    } catch (err) {
+      alert('Erreur lors du chargement du menu');
+      console.error(err);
+    }
+  }
+
+  // Fonction par défaut pour création (réinitialise submit)
+  function defaultFormSubmit(e) {
+    e.preventDefault();
+    // Même code que plus haut pour créer un menu
+    // On peut aussi extraire la fonction création pour éviter la duplication
+  }
+</script>
+<div id="header"></div>
+
+<script>
+  fetch('header.html')
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('header').innerHTML = html;
+    });
+</script>
+
+</body>
+</html>
