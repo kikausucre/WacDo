@@ -62,7 +62,7 @@
   const apiUrl = 'http://localhost:3000/api/menus';
   let composition = [];
 
-  // Ajouter un ingrédient à la composition
+  
   function addComposition() {
     const nom = document.getElementById('compNom').value.trim();
     const quantite = parseInt(document.getElementById('compQuantite').value);
@@ -76,7 +76,7 @@
     document.getElementById('compQuantite').value = '';
   }
 
-  // Afficher la liste des ingrédients dans la composition
+  
   function renderComposition() {
     const list = document.getElementById('compositionList');
     list.innerHTML = '';
@@ -96,7 +96,7 @@
     });
   }
 
-  // Créer ou modifier un menu
+  
   document.getElementById('menuForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -110,7 +110,7 @@
 
     try {
       const res = await fetch(apiUrl, {
-        method: 'POST',  // à adapter si tu veux gérer aussi la modification (PUT)
+        method: 'POST', 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
@@ -157,7 +157,7 @@
     }
   }
 
-  // Supprimer un menu
+  
   async function deleteMenu(id) {
     if (!confirm('Voulez-vous vraiment supprimer ce menu ?')) return;
     try {
@@ -170,7 +170,7 @@
     }
   }
 
-  // Modifier un menu (charge les données dans le formulaire)
+  
   async function editMenu(id) {
     try {
       const res = await fetch(`${apiUrl}/${id}`);
@@ -183,7 +183,7 @@
       composition = menu.composition || [];
       renderComposition();
 
-      // Change le submit pour faire un PUT au lieu de POST
+     
       document.getElementById('menuForm').onsubmit = async (e) => {
         e.preventDefault();
         const data = {
@@ -204,7 +204,7 @@
           composition = [];
           renderComposition();
           document.getElementById('menuForm').reset();
-          // Restaure le comportement du formulaire pour création
+          
           document.getElementById('menuForm').onsubmit = defaultFormSubmit;
           getMenus();
         } catch (err) {
@@ -218,11 +218,10 @@
     }
   }
 
-  // Fonction par défaut pour création (réinitialise submit)
+ 
   function defaultFormSubmit(e) {
     e.preventDefault();
-    // Même code que plus haut pour créer un menu
-    // On peut aussi extraire la fonction création pour éviter la duplication
+
   }
 </script>
 <div id="header"></div>

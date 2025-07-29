@@ -1,14 +1,14 @@
 // Connexion à la db
-
+require('dotenv').config();
 const mongoose = require('mongoose');
 
 function demarrageDataBase() {
 
-return mongoose.connect('mongodb+srv://kilian:WacDo123@cluster0.kkk12ln.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+return mongoose.connect(process.env.MONGODB_URI,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
-  .catch(() => console.log('Connexion à MongoDB échouée !'));
+  .catch(() => console.log('Connexion à MongoDB échouée ! '));
 
 
 };
