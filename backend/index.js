@@ -28,10 +28,11 @@ const limiter = rateLimit({
 
 app.use(limiter);
 //lancement DB
+if (require.main === module) {
 demarrageDataBase().then(() => {
   app.listen(3000, () => console.log('Serveur lancé'));
 });
-
+}
 
 //ajoute les routes sous le chemin /api/
 app.use('/api', userRoutes);
