@@ -6,27 +6,27 @@ const { getAllProduits, getProduitById, createProduit, putProduit, deleteProduit
 
 //getAllProduits
 describe('getAllProduits test des status', () => {
-  afterEach(() => sinon.restore()); // remet a 0 apres chaque test
+  afterEach(() => sinon.restore()); // Après chaque test, restaure tous les stubs pour éviter que les tests suivants soient affectés
 
   it('retourne 200 si OK', async () => {
-    sinon.stub(Produit, 'find').resolves([]); // Simule succès DB
-    const res = { status: sinon.stub().returnsThis(), json: sinon.stub() };
-    await getAllProduits({}, res);
-    expect(res.status.calledWith(200)).to.be.true; // Vérifie 200
+    sinon.stub(Produit, 'find').resolves([]); // On simule la méthode Produit.find() de la base de données pour qu'elle renvoie un tableau vide (succès)
+    const res = { status: sinon.stub().returnsThis(), json: sinon.stub() }; // Création d’un objet 'res' simulé : status() retourne 'res'
+    await getAllProduits({}, res);  // On appelle la fonction getAllProduits avec req vide et notre res simulé
+    expect(res.status.calledWith(200)).to.be.true; // Vérifie que res.status(200) a bien été appelé → succès
   });
 
   it('retourne 400 si erreur', async () => {
-    sinon.stub(Produit, 'find').rejects(new Error('DB error')); // Simule erreur DB
-    const res = { status: sinon.stub().returnsThis(), json: sinon.stub() }; 
-    await getAllProduits({}, res); 
-    expect(res.status.calledWith(400)).to.be.true; // Vérifie 400
+    sinon.stub(Produit, 'find').rejects(new Error('DB error')); // On simule une erreur de DB (Produit.find() rejette une erreur)
+    const res = { status: sinon.stub().returnsThis(), json: sinon.stub() }; // Objet 'res' simulé
+    await getAllProduits({}, res); // On appelle la fonction getAllProduits avec req vide et notre res simulé
+    expect(res.status.calledWith(400)).to.be.true; // Vérifie que res.status(400) a été appelé → erreur détectée correctement
   });
 });
 
 
 // getProduitById
 describe('getProduitById', () => {
-  afterEach(() => sinon.restore()); // remet a 0 apres chaque test
+  afterEach(() => sinon.restore()); 
 
   it('retourne 200 si OK', async () => {
       sinon.stub(Produit, 'findById').resolves({ nom: 'Produit1' });
@@ -60,7 +60,7 @@ describe('getProduitById', () => {
 
 // createProduit
 describe('createProduit', () => {
-  afterEach(() => sinon.restore()); // restaure les stubs après chaque test
+  afterEach(() => sinon.restore()); 
 
   it('retourne 201 si OK', async () => {
     const saveStub = sinon.stub().resolves();

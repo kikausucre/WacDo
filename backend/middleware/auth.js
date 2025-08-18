@@ -12,7 +12,7 @@ module.exports = function (req, res, next) {
     }
     try {
         const user = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET );
-        req.user = user; //stock user dans le req
+        req.user = user; 
         next();
 
         } catch(err) {

@@ -1,6 +1,6 @@
 const express = require('express');
-const router = express.Router(); //Creer un router
-const productController = require('../controllers/productController');//importe le controleur produit getAllProduits necessaire
+const router = express.Router(); //Creer un router qui permet d'organiser les routes
+const productController = require('../controllers/productController');
 const authorize = require('../middleware/roleMiddleware');
 const upload = require('../middleware/upload');
 
