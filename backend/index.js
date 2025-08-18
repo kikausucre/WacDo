@@ -39,7 +39,7 @@ app.use(limiter);
 if (require.main === module) {                //if (require.main === module) => permet de lancer la DB uniquement depuis index.js
 demarrageDataBase().then(() => {
   app.listen(3000, () => console.log('Serveur lancé'));
-});
+}); 
 }
 
 //ajoute les routes sous le chemin /api/
@@ -47,7 +47,7 @@ app.use('/api', userRoutes);
 app.use('/api', auth, productRoutes);
 app.use('/api', auth, menuRoutes);
 app.use('/api', auth, orderRoutes);
-
+ 
 app.use(errors);
 
 // Route racine qui redirige vers Swagger 
