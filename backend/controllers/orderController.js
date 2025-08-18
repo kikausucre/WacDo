@@ -1,35 +1,31 @@
-
 const Order = require('../models/Order'); 
 const Product = require('../models/Product');
 const Menu = require('../models/Menu');
 
-
-    // Création d'une Commande'
+// Création d'une commande
 exports.createOrder = async (req, res) => {
   try {
-    const { produits = [], supplements = [], nomClient, heureLivraison } = req.body; //recupere dans la requete
+    const { produits = [], supplements = [], nomClient, heureLivraison } = req.body;
 
     let total = 0;
 
-    
-    for (const item of produits) {//calcul le prix des produits
+    for (const item of produits) {
       if (item.type.toLowerCase() === 'produit') {
         const produit = await Product.findOne({ nom: item.nom });
         if (!produit) continue;
         total += produit.prix * (item.quantite || 1);
-
-      } else if (item.type.toLowerCase() === 'menu') { // calcul le prix des menus
+      } else if (item.type.toLowerCase() === 'menu') {
         const menu = await Menu.findOne({ nom: item.nom });
         if (!menu) continue;
         total += menu.prix * (item.quantite || 1);
       }
     }
 
-    for (const sup of supplements) { // calcul les supplements 
+    for (const sup of supplements) {
       total += (sup.prix || 0) * (sup.quantite || 1);
     }
 
-    const nouvelleOrder = new Order({ // cree la commande 
+    const nouvelleOrder = new Order({
       nomClient,
       heureCommande: new Date(),
       heureLivraison,
@@ -47,33 +43,33 @@ exports.createOrder = async (req, res) => {
   }
 };
 
-
-//recupere la liste des commandes dans la DB
-exports.getAllOrder = (req, res) => {
-  Order.find()
-    .sort({ heureLivraison: 1 }) //1 pour ordre croissant
-    .then(menus => res.status(200).json(menus))
-    .catch(error => res.status(400).json({ error }));
+// Récupère toutes les commandes
+exports.getAllOrder = async (req, res) => {
+  try {
+    const orders = await Order.find().sort({ heureLivraison: 1 });
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
-
-//Modifie statut de la commande Commande
-exports.putOrder = (req, res) => {
-const etat = req.body.etat;
-
- Order.updateOne(
-    { _id: req.params.id },
-    { $set: { etat } }
- )
-    .then(() => res.status(200).json({ message: 'Commande modifié !'}))          
-    .catch(error => res.status(400).json({ error }));
+// Modifie le statut d'une commande
+exports.putOrder = async (req, res) => {
+  try {
+    const etat = req.body.etat;
+    await Order.updateOne({ _id: req.params.id }, { $set: { etat } });
+    res.status(200).json({ message: 'Commande modifiée !' });
+  } catch (error) {
+    res.status(400).json({ error });
+  }
 };
 
-//Supprime Commande
-exports.deleteOrder = (req, res) => {
- Order.deleteOne({_id: req.params.id } )
-     .then(() => res.status(200).json({ message: 'Commande supprimé !'}))
-     .catch(error => res.status(400).json({ error }));
-
+// Supprime une commande
+exports.deleteOrder = async (req, res) => {
+  try {
+    await Order.deleteOne({ _id: req.params.id });
+    res.status(200).json({ message: 'Commande supprimée !' });
+  } catch (error) {
+    res.status(400).json({ error });
+  }
 };
-

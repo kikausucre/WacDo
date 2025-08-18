@@ -1,0 +1,646 @@
+openapi: 3.1.1
+info:
+  title: Wacdo API
+  version: 1.0.0
+  description: Interface d'administration pour gérer les produits d'un fastfood de vente à emporter.
+
+servers:
+  - url: http://localhost:3000/api
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []
+
+paths:
+  /products:
+    get:
+      summary: Récupérer tous les produits
+      tags:
+        - Produits
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des produits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    nom:
+                      type: string
+                    description:
+                      type: string
+                    image:
+                      type: string
+                    prix:
+                      type: number
+                    categorie:
+                      type: string
+                    disponible:
+                      type: boolean
+        '400':
+          description: Erreur de requête
+
+    post:
+      summary: Créer un nouveau produit avec image uploadée
+      tags:
+        - Produits
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                description:
+                  type: string
+                image:
+                  type: string
+                  format: binary   
+                prix:
+                  type: number
+                categorie:
+                  type: string
+                disponible:
+                  type: boolean
+              required:
+                - nom
+                - description
+                - image
+                - prix
+                - categorie
+      responses:
+        '201':
+          description: Produit créé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  nom:
+                    type: string
+                  description:
+                    type: string
+                  image:
+                    type: string
+                  prix:
+                    type: number
+                  categorie:
+                    type: string
+                  disponible:
+                    type: boolean
+        '400':
+          description: Erreur de création
+
+  /products/{id}:
+    get:
+      summary: Récupérer un produit par ID
+      tags:
+        - Produits
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Détails du produit
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  nom:
+                    type: string
+                  description:
+                    type: string
+                  image:
+                    type: string
+                  prix:
+                    type: number
+                  categorie:
+                    type: string
+                  disponible:
+                    type: boolean
+        '404':
+          description: Produit non trouvé
+        '500':
+          description: Erreur serveur
+
+    put:
+      summary: Modifier un produit par ID
+      tags:
+        - Produits
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                description:
+                  type: string
+                image:
+                  type: string
+                prix:
+                  type: number
+                categorie:
+                  type: string
+                disponible:
+                  type: boolean
+      responses:
+        '200':
+          description: Produit mis à jour
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  nom:
+                    type: string
+                  description:
+                    type: string
+                  image:
+                    type: string
+                  prix:
+                    type: number
+                  categorie:
+                    type: string
+                  disponible:
+                    type: boolean
+        '404':
+          description: Produit non trouvé
+        '500':
+          description: Erreur serveur
+
+    delete:
+      summary: Supprimer un produit par ID
+      tags:
+        - Produits
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Produit supprimé
+        '400':
+          description: Requête invalide
+
+  /menus:
+    get:
+      summary: Récupérer tous les menus
+      tags:
+        - Menus
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des menus récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    nom:
+                      type: string
+                    description:
+                      type: string
+                    image:
+                      type: string
+                    prix:
+                      type: number
+                    composition:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          nom:
+                            type: string
+                          quantite:
+                            type: number
+                    disponible:
+                      type: boolean
+        '400':
+          description: Requête invalide
+
+    post:
+      summary: Créer un nouveau menu
+      tags:
+        - Menus
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                description:
+                  type: string
+                image:
+                  type: string
+                prix:
+                  type: number
+                composition:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      nom:
+                        type: string
+                      quantite:
+                        type: number
+                disponible:
+                  type: boolean
+              required:
+                - nom
+                - description
+                - image
+                - prix
+                - composition
+      responses:
+        '201':
+          description: Menu créé avec succès
+        '400':
+          description: Erreur lors de la création
+
+  /menus/{id}:
+    put:
+      summary: Modifier un menu par ID
+      tags:
+        - Menus
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                description:
+                  type: string
+                image:
+                  type: string
+                prix:
+                  type: number
+                composition:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      nom:
+                        type: string
+                      quantite:
+                        type: number
+                disponible:
+                  type: boolean
+      responses:
+        '200':
+          description: Menu modifié avec succès
+        '400':
+          description: Requête invalide
+
+    delete:
+      summary: Supprimer un menu par ID
+      tags:
+        - Menus
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Menu supprimé avec succès
+        '400':
+          description: Erreur lors de la suppression
+
+  /orders:
+    get:
+      summary: Récupérer toutes les commandes
+      tags:
+        - Orders
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des commandes récupérée avec succès, triée par heure de livraison
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    nomClient:
+                      type: string
+                    heureCommande:
+                      type: string
+                      format: date-time
+                    heureLivraison:
+                      type: string
+                      format: date-time
+                    produits:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            description: "Type de l'article, 'produit' ou 'menu'"
+                          nom:
+                            type: string
+                          quantite:
+                            type: integer
+                    supplements:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          nom:
+                            type: string
+                          prix:
+                            type: number
+                          quantite:
+                            type: integer
+                    prixTotal:
+                      type: number
+                    etat:
+                      type: string
+                      description: "État de la commande (ex: 'en attente')"
+        '400':
+          description: Requête invalide
+
+    post:
+      summary: Créer une nouvelle commande
+      tags:
+        - Orders
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nomClient:
+                  type: string
+                heureLivraison:
+                  type: string
+                  format: date-time
+                produits:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        description: "Type de l'article, 'produit' ou 'menu'"
+                      nom:
+                        type: string
+                      quantite:
+                        type: integer
+                supplements:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      nom:
+                        type: string
+                      prix:
+                        type: number
+                      quantite:
+                        type: integer
+              required:
+                - nomClient
+                - heureLivraison
+      responses:
+        '201':
+          description: Commande créée avec succès avec le prix total calculé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  prixTotal:
+                    type: number
+        '400':
+          description: Erreur lors de la création de la commande
+
+  /orders/{id}:
+    put:
+      summary: Modifier l'état d'une commande par ID
+      tags:
+        - Orders
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                etat:
+                  type: string
+
+  /users/register:
+    post:
+      summary: Créer un nouvel utilisateur
+      tags:
+        - Users
+      description: Enregistre un nouvel utilisateur avec un mot de passe hashé et un rôle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                role:
+                  type: string
+              required:
+                - username
+                - password
+                - role
+      responses:
+        '201':
+          description: Utilisateur créé avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Utilisateur crée
+        '400':
+          description: Erreur lors de la création de l'utilisateur
+
+  /users/login:
+    post:
+      summary: Authentification utilisateur
+      tags:
+        - Users
+      description: Vérifie les identifiants et renvoie un token JWT valide
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Authentification réussie, token JWT retourné
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '404':
+          description: Utilisateur ou mot de passe incorrect
+
+  /users:
+    get:
+      summary: Récupérer la liste des utilisateurs
+      tags:
+        - Users
+      description: Retourne tous les utilisateurs (nécessite un token valide)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des utilisateurs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: 64c85d4e9a8d123456789abc
+                    username:
+                      type: string
+                      example: johndoe
+                    role:
+                      type: string
+                      example: admin
+        '401':
+          description: Non autorisé, token manquant ou invalide
+
+  /users/{id}:
+    delete:
+      summary: Supprimer un utilisateur par ID
+      tags:
+        - Users
+      description: Supprime un utilisateur identifié par son ID (nécessite un token valide)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID de l'utilisateur à supprimer
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Utilisateur supprimé avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Utilisateur supprimé
+        '404':
+          description: Utilisateur introuvable
+        '500':
+          description: Erreur serveur

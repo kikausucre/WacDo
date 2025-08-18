@@ -14,26 +14,30 @@ exports.createUser = async (req, res) => {
   res.status(201).json({message: 'Utilisateur crée'});
 
 
-
 };
 
 //login, verifie user et password et attribut token
-exports.userLogin = async (req, res) =>{
+exports.userLogin = async (req, res, next) =>{
   const {username, password} = req.body;
   const user = await User.findOne({username});
-  if(!user)
-    return res.status(404).json({message : 'Utilisateur/mot de passe incorrect'});
-  
+  if(!user){
+    const err = new Error('Utilisateur/mot de passe incorrect');
+        err.status = 404;
+       return next(err);
+    
+  }
   const isPasswordCorrect = await bcrypt.compare(password, user.password); //compare le mdp avec le hash de la db
   
-  if(!isPasswordCorrect)
-    return res.status(404).json({message : 'Utilisateur/mot de passe incorrect'});
-
+  if(!isPasswordCorrect){
+    const err = new Error('Utilisateur/mot de passe incorrect');
+        err.status = 404;
+       return snext(err);
+   
+  }
   const token = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn:'1h'});
   res.json({token})
 
 };
-
 
 //recupere les users
 exports.getUsers = async (req, res) => {
@@ -42,13 +46,18 @@ exports.getUsers = async (req, res) => {
 };
 
 //suprimmer un user
-exports.delUsers = async (req, res) => {
+exports.delUsers = async (req, res, next) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' });
+    if (!user){
+      const err = new Error('Utilisateur introuvable');
+        err.status = 404;
+        return next(err);
+       };
 
     res.json({ message: 'Utilisateur supprimé' });
-  } catch (err) {
+  } 
+  catch (err) {
     res.status(500).json({ message: 'Erreur serveur', error: err.message });
   }
 };

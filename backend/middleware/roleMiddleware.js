@@ -3,7 +3,11 @@
 module.exports = function authorizeRoles(...allowedRoles) {
   return (req, res, next) => {
     if (!req.user || !allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({ message: 'Accès refusé : rôle insuffisant' });
+      
+      const err = new Error('Accès refusé : rôle insuffisant');
+        err.status = 403;
+        return next(err);
+
     }
     next();
   };
