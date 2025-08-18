@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const authorize = require('../middleware/roleMiddleware');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // enregistrement d'un user 
