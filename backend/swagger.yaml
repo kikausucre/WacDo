@@ -6,7 +6,10 @@ info:
 
 servers:
   - url: http://localhost:3000/api
-
+    description: local
+  - url: https://wacdo-4oqm.onrender.com
+    description: Production
+    
 components:
   securitySchemes:
     bearerAuth:
