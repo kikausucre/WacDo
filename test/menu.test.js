@@ -5,7 +5,7 @@ const Product = require('../backend/models/Product');
 const { createMenu, getAllMenu, putMenu, deleteMenu } = require('../backend/controllers/menuController');
 
 describe('Menu Controller', () => {
-  afterEach(() => sinon.restore()); // Reset tous les stubs après chaque test
+  afterEach(() => sinon.restore()); 
 
   //createMenu
   describe('createMenu', () => {

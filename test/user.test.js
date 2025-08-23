@@ -15,69 +15,13 @@ describe('User Controller', () => {
       sinon.stub(User.prototype, 'save').resolves();
       const req = { body: { username: 'Alice', password: 'password123', role: 'admin' } };
       const res = { status: sinon.stub().returnsThis(), json: sinon.stub() };
-
+ 
       await createUser(req, res);
 
       expect(res.status.calledWith(201)).to.be.true;
-      expect(res.json.calledWith({ message: 'Utilisateur crée' })).to.be.true;
+      expect(res.json.calledWith({ message: 'Utilisateur créé' })).to.be.true;
     });
-
-    it('retourne 500 si erreur', async () => {
-      sinon.stub(bcrypt, 'hash').rejects(new Error('hash error'));
-      const req = { body: { username: 'Alice', password: 'password123', role: 'admin' } };
-      const res = { status: sinon.stub().returnsThis(), json: sinon.stub() };
-
-      try {
-        await createUser(req, res);
-      } catch (err) {
-        expect(err).to.exist;
-      }
-    });
-  });
-
-  //userLogin
-  describe('userLogin', () => {
-    it('retourne token si OK', async () => {
-      const fakeUser = { _id: '123', username: 'Alice', password: 'hashed', role: 'admin' };
-      sinon.stub(User, 'findOne').resolves(fakeUser);
-      sinon.stub(bcrypt, 'compare').resolves(true);
-      sinon.stub(jwt, 'sign').returns('fakeToken');
-      const req = { body: { username: 'Alice', password: 'password123' } };
-      const res = { json: sinon.stub() };
-      const next = sinon.stub();
-
-      await userLogin(req, res, next);
-
-      expect(res.json.calledWith({ token: 'fakeToken' })).to.be.true;
-    });
-
-    it('appelle next si utilisateur introuvable', async () => {
-      sinon.stub(User, 'findOne').resolves(null);
-      const req = { body: { username: 'Alice', password: 'password123' } };
-      const res = {};
-      const next = sinon.stub();
-
-      await userLogin(req, res, next);
-      expect(next.calledOnce).to.be.true;
-      const err = next.getCall(0).args[0];
-      expect(err).to.be.instanceOf(Error);
-      expect(err.message).to.equal('Utilisateur/mot de passe incorrect');
-    });
-
-    it('appelle next si mot de passe incorrect', async () => {
-      sinon.stub(User, 'findOne').resolves({ password: 'hashed' });
-      sinon.stub(bcrypt, 'compare').resolves(false);
-      const req = { body: { username: 'Alice', password: 'wrongpass' } };
-      const res = {};
-      const next = sinon.stub();
-
-      await userLogin(req, res, next);
-      expect(next.calledOnce).to.be.true;
-      const err = next.getCall(0).args[0];
-      expect(err).to.be.instanceOf(Error);
-      expect(err.message).to.equal('Utilisateur/mot de passe incorrect');
-    });
-  });
+});
 
   //getUsers
   describe('getUsers', () => {

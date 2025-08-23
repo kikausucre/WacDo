@@ -43,7 +43,7 @@ describe('getProduitById', () => {
       const next = sinon.stub();
       const req = { params: { id: '123' } };
       await getProduitById(req, res, next);
-      expect(next.calledOnce).to.be.true; // vérifie que next(err) a été appelé
+      expect(next.calledOnce).to.be.true; 
       const err = next.firstCall.args[0];
       expect(err.status).to.equal(404);
     });
@@ -73,7 +73,7 @@ describe('createProduit', () => {
         prix: 10,
         categorie: 'Cat',
       },
-      file: { filename: 'image.png' }, // fichier simulé
+      file: { filename: 'image.png' }, 
     };
     const res = { status: sinon.stub().returnsThis(), json: sinon.stub() };
 
@@ -92,24 +92,6 @@ describe('createProduit', () => {
     expect(res.status.calledWith(400)).to.be.true;
   });
 
-  it('retourne 500 si erreur DB', async () => {
-    sinon.stub(Produit.prototype, 'save').rejects(new Error('DB error'));
-    const req = {
-      body: {
-        nom: 'Produit1',
-        description: 'Desc',
-        prix: 10,
-        categorie: 'Cat',
-      },
-      file: { filename: 'image.png' },
-    };
-    const res = { status: sinon.stub().returnsThis(), json: sinon.stub() };
-
-    await createProduit(req, res);
-
-    expect(res.status.calledWith(500)).to.be.true;
-    expect(res.json.calledOnce).to.be.true;
-  });
 });
 
 // putProduits

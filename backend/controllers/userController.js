@@ -4,16 +4,20 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // enregistrement d'un user 
-exports.createUser = async (req, res) => {
-  const {username, password, role} = req.body;
-  const hashPassword = await bcrypt.hash(password, 10);
+exports.createUser = async (req, res, next) => {
+  try {
+    const { username, password, role } = req.body;
+    const hashPassword = await bcrypt.hash(password, 10);
+    const user = new User({ username, password: hashPassword, role });
+    await user.save();
 
-  const user = new User({username, password: hashPassword, role});
-  await user.save();
+    return res.status(201).json({ message: "Utilisateur créé" });
+    
+  } catch (err) {
+    console.error("Erreur lors de la création d’un utilisateur :", err);
 
-  res.status(201).json({message: 'Utilisateur crée'});
-
-
+    return res.status(500).json({ message: "Erreur serveur" });
+  }
 };
 
 //login, verifie user et password et attribut token
@@ -31,7 +35,7 @@ exports.userLogin = async (req, res, next) =>{
   if(!isPasswordCorrect){
     const err = new Error('Utilisateur/mot de passe incorrect');
         err.status = 404;
-       return snext(err);
+       return next(err);
    
   }
   const token = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn:'1h'});
