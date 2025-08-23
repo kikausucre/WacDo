@@ -556,6 +556,7 @@ paths:
   /users/login:
     post:
       summary: Authentification utilisateur
+      security: []
       tags:
         - Users
       description: Vérifie les identifiants et renvoie un token JWT valide
