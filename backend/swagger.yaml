@@ -516,7 +516,7 @@ paths:
                 etat:
                   type: string
 
-  /users/register:
+  /register:
     post:
       summary: Créer un nouvel utilisateur
       tags:
@@ -553,7 +553,7 @@ paths:
         '400':
           description: Erreur lors de la création de l'utilisateur
 
-  /users/login:
+  /login:
     post:
       summary: Authentification utilisateur
       security: []
